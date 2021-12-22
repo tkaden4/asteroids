@@ -19,10 +19,10 @@ type Collides = Physical & {
 
 function collidesWith(rect1: Collides, rect2: Collides): boolean {
   return (
-    rect1.x < rect2.x + rect2.bbox.width &&
-    rect1.x + rect1.bbox.width > rect2.x &&
-    rect1.y < rect2.y + rect2.bbox.height &&
-    rect1.bbox.height + rect1.y > rect2.y
+    rect1.x - rect1.bbox.width / 2 < rect2.x - rect2.bbox.width / 2 + rect2.bbox.width &&
+    rect1.x - rect1.bbox.width / 2 + rect1.bbox.width > rect2.x + rect2.bbox.width &&
+    rect1.y - rect1.bbox.height / 2 < rect2.y - rect2.bbox.height / 2 + rect2.bbox.height &&
+    rect1.bbox.height + rect1.y - rect1.bbox.height / 2 > rect2.y - rect2.bbox.height / 2
   );
 }
 
@@ -63,21 +63,20 @@ function asteroidEntity(
       ctx.strokeRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
     },
     update(_isPressed) {
-      if (this.height * this.width < 200) {
+      if (this.height * this.width < 400) {
         this.stale = true;
       }
       physicalUpdate(this);
     },
     onCollisionWith(entity) {
       if (entity.id === "bullet") {
-        const divergence = toRadians(Math.random() * 90);
         const dx = this.vx;
         const dy = this.vy;
 
         const asteroidLeft: Asteroid = {
           ...this,
-          width: this.width / Math.sqrt(2),
-          height: this.height / Math.sqrt(2),
+          width: this.height / Math.sqrt(2),
+          height: this.width / Math.sqrt(2),
           vx: dx,
           vy: -dy,
         };
@@ -146,10 +145,10 @@ function shipEntity(ship: Ship, onCreateBullet: (bullet: Bullet) => void): Entit
       const cosine = Math.cos(toRadians(this.theta - 90));
       const sine = Math.sin(toRadians(this.theta - 90));
       if (isPressed(Key.LEFT)) {
-        this.theta = (this.theta - 10) % 360;
+        this.theta = (this.theta - 5) % 360;
       }
       if (isPressed(Key.RIGHT)) {
-        this.theta = (this.theta + 10) % 360;
+        this.theta = (this.theta + 5) % 360;
       }
       if (isPressed(Key.UP)) {
         this.vx += cosine * this.speed;
@@ -348,7 +347,7 @@ function game(controlScheme: ControlScheme) {
     lastTime: 0,
     fire(bullet: Bullet) {
       const currentTime = Date.now();
-      if (currentTime - this.lastTime > 500) {
+      if (currentTime - this.lastTime > 300) {
         createPhysical(bulletEntity(bullet));
         this.lastTime = currentTime;
       }
@@ -361,7 +360,7 @@ function game(controlScheme: ControlScheme) {
   };
 
   createPhysical(
-    shipEntity({ x: 300, y: 300, vx: 0, vy: 0, speed: 0.5, theta: 0, friction: 0.02 }, (bullet) => gun.fire(bullet))
+    shipEntity({ x: 300, y: 300, vx: 0, vy: 0, speed: 0.3, theta: 0, friction: 0.02 }, (bullet) => gun.fire(bullet))
   );
 
   const spawnAsteroid = (asteroid: Asteroid) => {
@@ -372,10 +371,10 @@ function game(controlScheme: ControlScheme) {
     spawnAsteroid({
       x: Math.random() * 600,
       y: Math.random() * 600,
-      vx: Math.random() * 6 - 3,
-      vy: Math.random() * 6 - 3,
-      width: Math.random() * 30 + 25,
-      height: Math.random() * 30 + 25,
+      vx: Math.random() * 4 - 2,
+      vy: Math.random() * 4 - 2,
+      width: Math.random() * 40 + 35,
+      height: Math.random() * 40 + 35,
     });
   }
 
