@@ -1,0 +1,9 @@
+{
+  "name": "asteroids",
+  "version": "1.0.0",
+  "license": "MIT",
+  "devDependencies": {
+    "parcel": "^2.0.1",
+    "typescript": "^4.5.4"
+  }
+}
